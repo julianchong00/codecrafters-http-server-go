@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net"
 	"net/http"
@@ -11,12 +12,17 @@ import (
 )
 
 const (
-	AllowedPaths = `^/echo/.*$|^/$|^/user-agent$`
+	AllowedPaths = `^/echo/.*$|^/$|^/user-agent$|^/files/.*$`
 )
 
 func main() {
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
 	fmt.Println("Logs from your program will appear here!")
+
+	directoryPtr := flag.String("directory", "/dir/file", "a directory")
+	flag.Parse()
+
+	fmt.Println(directoryPtr)
 
 	l, err := net.Listen("tcp", "0.0.0.0:4221")
 	if err != nil {
