@@ -3,7 +3,10 @@ package main
 import (
 	"fmt"
 	"net"
+	"net/http"
 	"os"
+
+	utils "github.com/codecrafters-io/http-server-starter-go/app/http"
 )
 
 func main() {
@@ -28,8 +31,22 @@ func main() {
 func handleConnection(conn net.Conn) {
 	defer conn.Close()
 
-	_, err := conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
+	input := make([]byte, 1024)
+	_, err := conn.Read(input)
 	if err != nil {
+		fmt.Println("error reading connection: ", err.Error())
 		os.Exit(1)
+	}
+
+	req, err := utils.ParseRequest(input)
+	if err != nil {
+		fmt.Println("error parsing request: ", err.Error())
+	}
+
+	fmt.Printf("REQ: %v\n", req)
+	if req.Path == "/" {
+		utils.WriteResponse(conn, http.StatusOK, utils.StatusDesriptionOK)
+	} else {
+		utils.WriteResponse(conn, http.StatusNotFound, utils.StatusDescriptionNotFound)
 	}
 }
