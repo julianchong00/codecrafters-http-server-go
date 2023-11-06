@@ -34,11 +34,6 @@ func ParseRequest(request []byte) (Request, error) {
 			firstLine = false
 			continue
 		}
-
-		// if len(line) > 0 {
-		// 	words := bytes.Split(line, []byte(": "))
-		// 	req.Headers[string(words[0])] = string(words[1])
-		// }
 	}
 
 	return req, nil
