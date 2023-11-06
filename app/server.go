@@ -22,7 +22,7 @@ func main() {
 	directoryPtr := flag.String("directory", "/dir/file", "a directory")
 	flag.Parse()
 
-	fmt.Println(directoryPtr)
+	fmt.Println(*directoryPtr)
 
 	l, err := net.Listen("tcp", "0.0.0.0:4221")
 	if err != nil {
