@@ -26,7 +26,9 @@ func main() {
 }
 
 func handleConnection(conn net.Conn) {
-	_, err := conn.Write([]byte("OK\r\n\r\n"))
+	defer conn.Close()
+
+	_, err := conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
 	if err != nil {
 		os.Exit(1)
 	}
