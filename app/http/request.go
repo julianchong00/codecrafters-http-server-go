@@ -19,6 +19,7 @@ func ParseRequest(request []byte) (Request, error) {
 	scanner := bufio.NewScanner(reader)
 
 	var req Request
+	req.Headers = make(map[string]string)
 	firstLine := true
 	for scanner.Scan() {
 		line := scanner.Bytes()
@@ -33,6 +34,9 @@ func ParseRequest(request []byte) (Request, error) {
 			firstLine = false
 			continue
 		}
+
+		words := bytes.Split(line, []byte(": "))
+		req.Headers[string(words[0])] = string(words[1])
 	}
 
 	return req, nil
