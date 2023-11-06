@@ -19,7 +19,7 @@ func main() {
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
 	fmt.Println("Logs from your program will appear here!")
 
-	directoryPtr := flag.String("directory", "/dir/file", "a directory")
+	directoryPtr := flag.String("directory", "no dir given", "a directory")
 	flag.Parse()
 
 	fmt.Println(*directoryPtr)
