@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	AllowedPaths = `^/echo/,.*$|^/$|^/user-agent$`
+	AllowedPaths = `^/echo/.*$|^/$|^/user-agent$`
 )
 
 func main() {
