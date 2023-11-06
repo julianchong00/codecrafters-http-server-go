@@ -28,9 +28,15 @@ func NewResponse(req Request, statusCode int) Response {
 	resp.StatusCode = statusCode
 	resp.StatusLine = StatusLineMap[statusCode]
 	resp.Headers = make(map[string]string)
-
-	body := req.Headers["User-Agent"]
 	resp.Headers["Content-Type"] = "text/plain"
+
+	var body string
+	if strings.Contains(req.Path, "/echo/") {
+		body = strings.Replace(req.Path, "/echo/", "", 1)
+	} else if strings.Contains(req.Path, "/user-agent") {
+		body = req.Headers["User-Agent"]
+	}
+
 	resp.Headers["Content-Length"] = fmt.Sprintf("%d", len(body))
 	resp.Body = []byte(body)
 
