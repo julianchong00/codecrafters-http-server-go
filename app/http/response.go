@@ -45,7 +45,6 @@ func NewResponse(req Request, statusCode int) Response {
 
 func (r Response) WriteResponse(w io.Writer) {
 	var out strings.Builder
-	// statusLine := fmt.Sprintf("HTTP/1.1 %d %s %s", statusCode, , CRLF)
 	out.WriteString(r.StatusLine + CRLF)
 	for header, value := range r.Headers {
 		out.WriteString(header + ": " + value + CRLF)
