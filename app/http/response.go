@@ -3,18 +3,55 @@ package http
 import (
 	"fmt"
 	"io"
+	"net/http"
 	"strings"
 )
 
+var StatusLineMap = map[int]string{
+	http.StatusOK:       "HTTP/1.1 200 OK",
+	http.StatusNotFound: "HTTP/1.1 404 Not Found",
+}
+
 const (
-	StatusDesriptionOK        = "OK"
-	StatusDescriptionNotFound = "Not Found"
+	CRLF = "\r\n"
 )
 
-func WriteResponse(w io.Writer, statusCode int, statusDescription string) {
+type Response struct {
+	StatusCode int
+	StatusLine string
+	Headers    map[string]string
+	Body       []byte
+}
+
+func NewResponse(req Request, statusCode int) Response {
+	var resp Response
+	resp.StatusCode = statusCode
+	resp.StatusLine = StatusLineMap[statusCode]
+	resp.Headers = make(map[string]string)
+
+	if strings.Contains(req.Path, "/echo/") {
+		body := strings.Replace(req.Path, "/echo/", "", 1)
+		resp.Headers["Content-Type"] = "text/plain"
+		resp.Headers["Content-Length"] = fmt.Sprintf("%d", len(body))
+		resp.Body = []byte(body)
+	}
+
+	return resp
+}
+
+func (r Response) WriteResponse(w io.Writer) {
 	var out strings.Builder
-	statusLine := fmt.Sprintf("HTTP/1.1 %d %s \r\n", statusCode, statusDescription)
-	out.WriteString(statusLine)
-	out.WriteString("\r\n")
-	w.Write([]byte(out.String()))
+	// statusLine := fmt.Sprintf("HTTP/1.1 %d %s %s", statusCode, , CRLF)
+	out.WriteString(r.StatusLine + CRLF)
+	for header, value := range r.Headers {
+		out.WriteString(header + ": " + value + CRLF)
+	}
+	out.WriteString(CRLF)
+	out.Write(r.Body)
+
+	_, err := w.Write([]byte(out.String()))
+	if err != nil {
+		fmt.Println("failed to write to socket", err.Error())
+		return
+	}
 }

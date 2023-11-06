@@ -5,8 +5,13 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"regexp"
 
 	utils "github.com/codecrafters-io/http-server-starter-go/app/http"
+)
+
+const (
+	AllowedPaths = `^/echo/.*$|^/$`
 )
 
 func main() {
@@ -43,10 +48,17 @@ func handleConnection(conn net.Conn) {
 		fmt.Println("error parsing request: ", err.Error())
 	}
 
-	fmt.Printf("REQ: %v\n", req)
-	if req.Path == "/" {
-		utils.WriteResponse(conn, http.StatusOK, utils.StatusDesriptionOK)
+	statusCode := validatePath(req.Path)
+
+	resp := utils.NewResponse(req, statusCode)
+	resp.WriteResponse(conn)
+}
+
+func validatePath(path string) int {
+	validPathRegex := regexp.MustCompile(AllowedPaths)
+	if validPathRegex.MatchString(path) {
+		return http.StatusOK
 	} else {
-		utils.WriteResponse(conn, http.StatusNotFound, utils.StatusDescriptionNotFound)
+		return http.StatusNotFound
 	}
 }
