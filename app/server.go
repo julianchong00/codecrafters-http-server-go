@@ -74,6 +74,7 @@ func handleConnection(conn net.Conn, directory string) {
 }
 
 func readFile(directory string) ([]byte, error) {
+	fmt.Println("Directory: ", directory)
 	file, err := os.Open(directory)
 	if err != nil {
 		return nil, err
@@ -85,6 +86,7 @@ func readFile(directory string) ([]byte, error) {
 
 	for scanner.Scan() {
 		line := scanner.Bytes()
+		fmt.Println(scanner.Text())
 		buffer = append(buffer, line...)
 	}
 
