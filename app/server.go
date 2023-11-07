@@ -63,13 +63,22 @@ func handleConnection(conn net.Conn, directory string) {
 	var fileContent []byte
 	if directory != "" {
 		filename := strings.Replace(req.Path, "/files/", "", 1)
+		path := directory + filename
 
 		// read file contents
-		fileContent, err = readFile(directory, filename)
+		fileContent, err = readFile(path)
 		if err != nil {
-			fmt.Println("failed to read contents of file at directory: ", directory)
+			fmt.Println("failed to read contents of file at directory: ", directory+filename)
 			// Set status code to not found if error occurred while reading file
 			statusCode = http.StatusNotFound
+		}
+
+		if req.Method == http.MethodPost {
+			err = writeFile(path, fileContent)
+			if err != nil {
+				fmt.Println("failed to write contents to file at directory: ", directory+filename)
+			}
+			statusCode = http.StatusCreated
 		}
 	}
 
@@ -77,20 +86,13 @@ func handleConnection(conn net.Conn, directory string) {
 	resp.WriteResponse(conn)
 }
 
-func readFile(directory string, filename string) ([]byte, error) {
-	fullPath := directory + filename
-	if _, err := os.Stat(fullPath); errors.Is(err, os.ErrNotExist) {
-		fmt.Println("file does not exist: ", directory+filename)
+func readFile(path string) ([]byte, error) {
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		fmt.Println("file does not exist: ", path)
 		return nil, err
 	}
 
-	// cwd, err := os.Getwd()
-	// if err != nil {
-	// 	fmt.Println("failed to get current working directory")
-	// 	return nil, err
-	// }
-
-	file, err := os.Open(fullPath)
+	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
@@ -106,6 +108,21 @@ func readFile(directory string, filename string) ([]byte, error) {
 	}
 
 	return buffer, nil
+}
+
+func writeFile(path string, lines []byte) error {
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	writer := bufio.NewWriter(file)
+	for _, line := range lines {
+		fmt.Fprintln(writer, line)
+	}
+
+	return writer.Flush()
 }
 
 func validatePath(path string) int {

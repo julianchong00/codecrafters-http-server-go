@@ -10,6 +10,7 @@ import (
 var StatusLineMap = map[int]string{
 	http.StatusOK:       "HTTP/1.1 200 OK",
 	http.StatusNotFound: "HTTP/1.1 404 Not Found",
+	http.StatusCreated:  "HTTP/1.1 201 Created",
 }
 
 const (
@@ -27,6 +28,10 @@ func NewResponse(req Request, statusCode int, fileContent []byte) Response {
 	var resp Response
 	resp.StatusCode = statusCode
 	resp.StatusLine = StatusLineMap[statusCode]
+	if statusCode == http.StatusCreated {
+		return resp
+	}
+
 	resp.Headers = make(map[string]string)
 	resp.Headers["Content-Type"] = "text/plain"
 

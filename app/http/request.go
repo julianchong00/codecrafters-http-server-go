@@ -15,11 +15,17 @@ type Request struct {
 }
 
 func ParseRequest(request []byte) (Request, error) {
-	reader := bytes.NewReader(request)
-	scanner := bufio.NewScanner(reader)
-
 	var req Request
 	req.Headers = make(map[string]string)
+
+	parts := bytes.Split(request, []byte(CRLF+CRLF))
+	if len(parts) < 2 {
+		return req, fmt.Errorf("expected 2 parts in request, but was %d", len(parts))
+	}
+
+	// Read request method, path, version, and headers
+	reader := bytes.NewReader(parts[0])
+	scanner := bufio.NewScanner(reader)
 	firstLine := true
 	for scanner.Scan() {
 		line := scanner.Bytes()
@@ -42,6 +48,14 @@ func ParseRequest(request []byte) (Request, error) {
 			return req, fmt.Errorf("expected header line to be 2 tokens, but was %d", len(words))
 		}
 		req.Headers[string(words[0])] = string(words[1])
+	}
+
+	// Read request body
+	reader = bytes.NewReader(parts[1])
+	scanner = bufio.NewScanner(reader)
+	for scanner.Scan() {
+		line := scanner.Bytes()
+		req.Body = append(req.Body, line...)
 	}
 
 	return req, nil
