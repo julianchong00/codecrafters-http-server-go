@@ -81,8 +81,7 @@ func readFile(directory string) ([]byte, error) {
 	defer file.Close()
 
 	var buffer []byte
-	reader := bufio.NewReader(file)
-	scanner := bufio.NewScanner(reader)
+	scanner := bufio.NewScanner(file)
 
 	for scanner.Scan() {
 		line := scanner.Bytes()
