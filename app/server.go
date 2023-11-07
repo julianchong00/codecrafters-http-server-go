@@ -119,7 +119,7 @@ func writeFile(path string, lines []byte) error {
 	defer file.Close()
 
 	writer := bufio.NewWriter(file)
-	writer.Write(bytes.Trim(lines, " "))
+	writer.Write(bytes.Trim(lines, "\x00"))
 
 	return writer.Flush()
 }
