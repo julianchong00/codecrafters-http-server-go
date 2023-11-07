@@ -66,17 +66,18 @@ func handleConnection(conn net.Conn, directory string) {
 		path := directory + filename
 
 		// read file contents
-		fileContent, err = readFile(path)
-		if err != nil {
-			fmt.Println("failed to read contents of file at directory: ", directory+filename)
-			// Set status code to not found if error occurred while reading file
-			statusCode = http.StatusNotFound
-		}
-
-		if req.Method == http.MethodPost {
-			err = writeFile(path, fileContent)
+		switch req.Method {
+		case http.MethodGet:
+			fileContent, err = readFile(path)
 			if err != nil {
-				fmt.Println("failed to write contents to file at directory: ", directory+filename)
+				fmt.Println("failed to read contents of file at directory: ", path)
+				// Set status code to not found if error occurred while reading file
+				statusCode = http.StatusNotFound
+			}
+		case http.MethodPost:
+			err = writeFile(path, req.Body)
+			if err != nil {
+				fmt.Println("failed to write contents to file at directory: ", path)
 			}
 			statusCode = http.StatusCreated
 		}
