@@ -37,13 +37,11 @@ func NewResponse(req Request, statusCode int, fileContent []byte) Response {
 		body = req.Headers["User-Agent"]
 	} else if strings.Contains(req.Path, "/files/") {
 		resp.Headers["Content-Type"] = "application/octet-stream"
+		body = string(fileContent)
 	}
 
 	resp.Headers["Content-Length"] = fmt.Sprintf("%d", len(body))
 	resp.Body = []byte(body)
-	if fileContent != nil {
-		resp.Body = fileContent
-	}
 
 	return resp
 }

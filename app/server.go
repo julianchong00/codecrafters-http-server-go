@@ -78,7 +78,8 @@ func handleConnection(conn net.Conn, directory string) {
 }
 
 func readFile(directory string, filename string) ([]byte, error) {
-	if _, err := os.Stat(directory + filename); errors.Is(err, os.ErrNotExist) {
+	fullPath := directory + filename
+	if _, err := os.Stat(fullPath); errors.Is(err, os.ErrNotExist) {
 		fmt.Println("file does not exist: ", directory+filename)
 		return nil, err
 	}
@@ -89,8 +90,7 @@ func readFile(directory string, filename string) ([]byte, error) {
 	// 	return nil, err
 	// }
 
-	fmt.Println("Directory: ", directory+filename)
-	file, err := os.Open(directory + filename)
+	file, err := os.Open(fullPath)
 	if err != nil {
 		return nil, err
 	}
