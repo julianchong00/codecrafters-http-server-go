@@ -55,7 +55,6 @@ func ParseRequest(request []byte) (Request, error) {
 	scanner = bufio.NewScanner(reader)
 	for scanner.Scan() {
 		line := scanner.Bytes()
-		fmt.Println(string(line))
 		req.Body = append(req.Body, line...)
 	}
 

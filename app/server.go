@@ -75,6 +75,7 @@ func handleConnection(conn net.Conn, directory string) {
 				statusCode = http.StatusNotFound
 			}
 		case http.MethodPost:
+			fmt.Println(string(req.Body))
 			err = writeFile(path, req.Body)
 			if err != nil {
 				fmt.Println("failed to write contents to file at directory: ", path)
