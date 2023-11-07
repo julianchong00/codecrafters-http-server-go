@@ -2,12 +2,14 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"flag"
 	"fmt"
 	"net"
 	"net/http"
 	"os"
 	"regexp"
+	"strings"
 
 	utils "github.com/codecrafters-io/http-server-starter-go/app/http"
 )
@@ -60,8 +62,10 @@ func handleConnection(conn net.Conn, directory string) {
 
 	var fileContent []byte
 	if directory != "" {
+		filename := strings.Replace(req.Path, "/files/", "", 1)
+
 		// read file contents
-		fileContent, err = readFile(directory)
+		fileContent, err = readFile(directory, filename)
 		if err != nil {
 			fmt.Println("failed to read contents of file at directory: ", directory)
 			// Set status code to not found if error occurred while reading file
@@ -73,15 +77,19 @@ func handleConnection(conn net.Conn, directory string) {
 	resp.WriteResponse(conn)
 }
 
-func readFile(directory string) ([]byte, error) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		fmt.Println("failed to get current working directory")
+func readFile(directory string, filename string) ([]byte, error) {
+	if _, err := os.Stat(directory + filename); errors.Is(err, os.ErrNotExist) {
+		fmt.Println("file does not exist: ", directory+filename)
 		return nil, err
 	}
 
-	fmt.Println("CWD: ", cwd)
-	fmt.Println("Directory: ", directory)
+	// cwd, err := os.Getwd()
+	// if err != nil {
+	// 	fmt.Println("failed to get current working directory")
+	// 	return nil, err
+	// }
+
+	fmt.Println("Directory: ", directory+filename)
 	file, err := os.Open(directory)
 	if err != nil {
 		return nil, err
