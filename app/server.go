@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"net"
@@ -19,10 +20,8 @@ func main() {
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
 	fmt.Println("Logs from your program will appear here!")
 
-	directoryPtr := flag.String("directory", "no dir given", "a directory")
+	directoryPtr := flag.String("directory", "", "a directory")
 	flag.Parse()
-
-	fmt.Println(*directoryPtr)
 
 	l, err := net.Listen("tcp", "0.0.0.0:4221")
 	if err != nil {
@@ -38,11 +37,11 @@ func main() {
 			os.Exit(1)
 		}
 
-		go handleConnection(conn)
+		go handleConnection(conn, *directoryPtr)
 	}
 }
 
-func handleConnection(conn net.Conn) {
+func handleConnection(conn net.Conn, directory string) {
 	defer conn.Close()
 
 	input := make([]byte, 1024)
@@ -59,8 +58,38 @@ func handleConnection(conn net.Conn) {
 
 	statusCode := validatePath(req.Path)
 
-	resp := utils.NewResponse(req, statusCode)
+	var fileContent []byte
+	if directory != "" {
+		// read file contents
+		fileContent, err = readFile(directory)
+		if err != nil {
+			fmt.Println("failed to read contents of file at directory: ", directory)
+			// Set status code to not found if error occurred while reading file
+			statusCode = http.StatusNotFound
+		}
+	}
+
+	resp := utils.NewResponse(req, statusCode, fileContent)
 	resp.WriteResponse(conn)
+}
+
+func readFile(directory string) ([]byte, error) {
+	file, err := os.Open(directory)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var buffer []byte
+	reader := bufio.NewReader(file)
+	scanner := bufio.NewScanner(reader)
+
+	for scanner.Scan() {
+		line := scanner.Bytes()
+		buffer = append(buffer, line...)
+	}
+
+	return buffer, nil
 }
 
 func validatePath(path string) int {

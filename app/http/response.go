@@ -23,7 +23,7 @@ type Response struct {
 	Body       []byte
 }
 
-func NewResponse(req Request, statusCode int) Response {
+func NewResponse(req Request, statusCode int, fileContent []byte) Response {
 	var resp Response
 	resp.StatusCode = statusCode
 	resp.StatusLine = StatusLineMap[statusCode]
@@ -35,10 +35,15 @@ func NewResponse(req Request, statusCode int) Response {
 		body = strings.Replace(req.Path, "/echo/", "", 1)
 	} else if strings.Contains(req.Path, "/user-agent") {
 		body = req.Headers["User-Agent"]
+	} else if strings.Contains(req.Path, "/files/") {
+		resp.Headers["Content-Type"] = "application/octet-stream"
 	}
 
 	resp.Headers["Content-Length"] = fmt.Sprintf("%d", len(body))
 	resp.Body = []byte(body)
+	if fileContent != nil {
+		resp.Body = fileContent
+	}
 
 	return resp
 }
