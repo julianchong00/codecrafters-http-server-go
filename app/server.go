@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"flag"
 	"fmt"
@@ -118,7 +119,7 @@ func writeFile(path string, lines []byte) error {
 	defer file.Close()
 
 	writer := bufio.NewWriter(file)
-	writer.WriteString(strings.TrimSpace(string(lines)))
+	writer.Write(bytes.Trim(lines, " "))
 
 	return writer.Flush()
 }
