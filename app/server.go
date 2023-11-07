@@ -104,7 +104,6 @@ func readFile(path string) ([]byte, error) {
 
 	for scanner.Scan() {
 		line := scanner.Bytes()
-		fmt.Println(scanner.Text())
 		buffer = append(buffer, line...)
 	}
 
@@ -120,7 +119,7 @@ func writeFile(path string, lines []byte) error {
 
 	writer := bufio.NewWriter(file)
 	for _, line := range lines {
-		fmt.Println(line)
+		fmt.Println(string(line))
 		fmt.Fprintln(writer, string(line))
 	}
 
