@@ -118,10 +118,7 @@ func writeFile(path string, lines []byte) error {
 	defer file.Close()
 
 	writer := bufio.NewWriter(file)
-	for _, line := range lines {
-		// fmt.Print(string(line))
-		fmt.Fprint(writer, line)
-	}
+	writer.Write(lines)
 
 	return writer.Flush()
 }
