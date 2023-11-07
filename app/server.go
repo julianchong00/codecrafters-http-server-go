@@ -120,7 +120,7 @@ func writeFile(path string, lines []byte) error {
 	writer := bufio.NewWriter(file)
 	for _, line := range lines {
 		fmt.Println(string(line))
-		fmt.Fprintln(writer, string(line))
+		fmt.Fprint(writer, string(line))
 	}
 
 	return writer.Flush()
