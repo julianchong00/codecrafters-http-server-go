@@ -90,7 +90,7 @@ func readFile(directory string, filename string) ([]byte, error) {
 	// }
 
 	fmt.Println("Directory: ", directory+filename)
-	file, err := os.Open(directory)
+	file, err := os.Open(directory + filename)
 	if err != nil {
 		return nil, err
 	}
