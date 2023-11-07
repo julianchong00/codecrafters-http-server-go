@@ -74,6 +74,13 @@ func handleConnection(conn net.Conn, directory string) {
 }
 
 func readFile(directory string) ([]byte, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		fmt.Println("failed to get current working directory")
+		return nil, err
+	}
+
+	fmt.Println("CWD: ", cwd)
 	fmt.Println("Directory: ", directory)
 	file, err := os.Open(directory)
 	if err != nil {
