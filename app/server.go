@@ -75,7 +75,6 @@ func handleConnection(conn net.Conn, directory string) {
 				statusCode = http.StatusNotFound
 			}
 		case http.MethodPost:
-			fmt.Println(string(req.Body))
 			err = writeFile(path, req.Body)
 			if err != nil {
 				fmt.Println("failed to write contents to file at directory: ", path)
@@ -121,7 +120,7 @@ func writeFile(path string, lines []byte) error {
 	writer := bufio.NewWriter(file)
 	for _, line := range lines {
 		// fmt.Print(string(line))
-		fmt.Fprint(writer, string(line))
+		fmt.Fprint(writer, line)
 	}
 
 	return writer.Flush()
